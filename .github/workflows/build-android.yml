@@ -11,14 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 用 Docker 打包 APK
+      - name: 构建自定义 Docker 镜像
         run: |
-          chmod +x build_apk.sh
+          docker build -t buildozer-custom -f Dockerfile .
+
+      - name: 打包 APK
+        run: |
           docker run --rm \
             --volume ${{ github.workspace }}:/home/user/hostcwd \
-            --entrypoint /bin/bash \
-            kivy/buildozer:latest \
-            /home/user/hostcwd/build_apk.sh 2>&1
+            buildozer-custom \
+            android debug 2>&1
 
       - name: 查找并上传 APK
         run: |
