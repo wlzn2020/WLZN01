@@ -19,7 +19,7 @@ jobs:
           docker run --rm \
             --volume ${{ github.workspace }}:/home/user/hostcwd \
             kivy/buildozer:latest \
-            buildozer android debug 2>&1
+            android debug 2>&1
 
       - name: 查找并上传 APK
         run: |
