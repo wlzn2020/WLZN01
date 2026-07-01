@@ -18,13 +18,16 @@ jobs:
         run: |
           docker run --rm \
             --volume ${{ github.workspace }}:/home/user/hostcwd \
+            --entrypoint /bin/bash \
             kivy/buildozer:latest \
-            android debug 2>&1
+            -c "sudo apt-get update -qq && sudo apt-get install -y -qq gettext && buildozer android debug" 2>&1
 
       - name: 查找并上传 APK
         run: |
+          find . -name "*.apk" -type f 2>/dev/null || echo "未找到 APK"
           mkdir -p /tmp/apk
           find . -name "*.apk" -type f -exec cp {} /tmp/apk/ \; 2>/dev/null || true
+          ls -la /tmp/apk/
 
       - name: 上传 APK 到 Actions
         uses: actions/upload-artifact@main
