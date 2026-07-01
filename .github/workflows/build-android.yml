@@ -11,24 +11,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 构建自定义 Docker 镜像
+      - name: 安装 SDK 依赖
         run: |
-          docker build -t buildozer-custom -f Dockerfile .
+          sudo apt-get update
+          sudo apt-get install -y gettext autopoint libtool automake \
+            openjdk-17-jdk unzip zip
 
-      - name: 打包 APK
+      - name: 设置 Java 环境
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 安装 Python 依赖
         run: |
-          docker run --rm \
-            --volume ${{ github.workspace }}:/home/user/hostcwd \
-            buildozer-custom \
-            android debug 2>&1
+          pip install buildozer cython pandas openpyxl python-calamine kivy
 
-      - name: 查找并上传 APK
+      - name: 构建 APK
         run: |
-          mkdir -p /tmp/apk
-          find . -name "*.apk" -type f -exec cp {} /tmp/apk/ \; 2>/dev/null || true
+          yes | buildozer android debug 2>&1
 
-      - name: 上传 APK 到 Actions
+      - name: 上传 APK
         uses: actions/upload-artifact@main
         with:
           name: wirerecognition-apk
-          path: /tmp/apk/*.apk
+          path: |
+            dist/android/*.apk
+            bin/*.apk
