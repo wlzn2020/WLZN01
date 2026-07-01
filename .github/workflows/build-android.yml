@@ -10,22 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 设置 Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: 安装依赖
+
+      - name: 用 Docker 打包 APK
         run: |
-          pip install buildozer cython
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool \
-            pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev
-      - name: 构建 APK
-        run: |
-          cd ${{ github.workspace }}
-          buildozer android debug
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            kivy/buildozer:1.5 \
+            buildozer android debug 2>&1
+
       - name: 上传 APK
         uses: actions/upload-artifact@v4
         with:
           name: wirerecognition-apk
-          path: dist/android/*.apk
+          path: |
+            dist/android/*.apk
+            bin/*.apk
