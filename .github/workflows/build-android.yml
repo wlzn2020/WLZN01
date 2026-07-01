@@ -9,25 +9,21 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: 检出代码
-        run: |
-          git clone --depth=1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }} || true
+      - uses: actions/checkout@v4
 
       - name: 用 Docker 打包 APK
         run: |
+          chmod +x build_apk.sh
           docker run --rm \
             --volume ${{ github.workspace }}:/home/user/hostcwd \
             --entrypoint /bin/bash \
             kivy/buildozer:latest \
-            -c "sudo apt-get update -qq && sudo apt-get install -y -qq gettext && yes | buildozer android debug" 2>&1
+            /home/user/hostcwd/build_apk.sh 2>&1
 
       - name: 查找并上传 APK
         run: |
-          find . -name "*.apk" -type f 2>/dev/null || echo "未找到 APK"
           mkdir -p /tmp/apk
           find . -name "*.apk" -type f -exec cp {} /tmp/apk/ \; 2>/dev/null || true
-          ls -la /tmp/apk/
 
       - name: 上传 APK 到 Actions
         uses: actions/upload-artifact@main
