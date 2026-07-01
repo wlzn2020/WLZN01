@@ -70,4 +70,5 @@ warn_on_root = 1
 python3.version = 3.11
 
 # 构建时使用的 Docker 镜像（推荐）
-docker_image = kivy/buildozer:1.5
+docker_image = kivy/buildozer:latest
+
