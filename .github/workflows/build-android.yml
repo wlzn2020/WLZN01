@@ -14,13 +14,28 @@ jobs:
           git clone --depth=1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }} || true
 
+      - name: 检查 Docker
+        run: |
+          docker version
+          docker info
+          echo "---测试拉取镜像---"
+          docker pull kivy/buildozer:1.5
+
       - name: 用 Docker 打包 APK
         run: |
+          sudo chmod -R 777 ${{ github.workspace }}
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
+            -e BUILD_REQUIREMENTS_FIRST=1 \
             kivy/buildozer:1.5 \
             buildozer android debug 2>&1
+
+      - name: 查找 APK
+        run: |
+          find ${{ github.workspace }} -name "*.apk" -type f 2>/dev/null || echo "未找到 APK"
+          ls -la ${{ github.workspace }}/dist/ 2>/dev/null || echo "无 dist 目录"
+          ls -la ${{ github.workspace }}/bin/ 2>/dev/null || echo "无 bin 目录"
 
       - name: 上传 APK
         uses: actions/upload-artifact@main
