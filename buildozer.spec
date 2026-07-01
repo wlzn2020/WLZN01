@@ -17,14 +17,14 @@ version.regex =
 version.filename =
 
 # 构建配置
-requirements = python3,kivy==2.3.1,pandas,openpyxl,python-calamine,plyer
+requirements = python3,kivy==2.3.1,pandas==1.5.3,numpy==1.24.4,openpyxl,python-calamine
 
 # Android 权限
 android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
 android.api = 33
 android.minapi = 24
 android.sdk = 34
-android.ndk = 25c
+android.ndk = 27c
 android.accept_sdk_license = True
 
 # 架构
